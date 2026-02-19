@@ -1584,7 +1584,7 @@ python -m tools.maps_scanner --no-verify -q -j scan tests/samples/eicar_test.com
 }
 ```
 
-> Pure JSON to stdout, no stderr info lines. Ideal for `jq` pipelines: `./maps --no-verify -q -j scan file.exe | jq .is_malicious`
+> Pure JSON to stdout, no stderr info lines. Ideal for `jq` pipelines: `./maps_scanner --no-verify -q -j scan file.exe | jq .is_malicious`
 
 ---
 

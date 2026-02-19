@@ -70,7 +70,6 @@ maps_scanner/
   client.py          # MAPS protocol client, config, and file analysis
   bond.py            # Microsoft Bond CompactBinaryV1 serializer/deserializer
   fuzz_maps.py       # API fuzzer for endpoint and field discovery
-  maps               # Bash wrapper script
   maps_scanner       # Python wrapper script
   requirements.txt   # Dependencies
   docs/              # Protocol documentation and test results

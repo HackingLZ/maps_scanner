@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# Wrapper to invoke maps_scanner as: ./maps scan file.exe
-# instead of: python3 -m tools.maps_scanner scan file.exe
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec python3 -m tools.maps_scanner "$@"
