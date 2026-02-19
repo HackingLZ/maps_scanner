@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAPS Protocol — Complete Technical Guide</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --danger: #ef4444;
+    --warn: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #8892a8;
+    --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+
+  /* Navigation */
+  .nav { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+  .nav-title { font-size: 14px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; }
+  .nav-controls { display: flex; gap: 12px; align-items: center; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .slide-counter { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; min-width: 60px; text-align: center; }
+  .progress { position: fixed; top: 55px; left: 0; right: 0; height: 2px; background: var(--border); z-index: 100; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.3s; }
+
+  /* Sidebar TOC */
+  .sidebar { position: fixed; left: 0; top: 56px; bottom: 0; width: 260px; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px 0; z-index: 50; transform: translateX(-260px); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .toc-item { padding: 8px 20px; font-size: 12px; color: var(--muted); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; }
+  .toc-item:hover { color: var(--text); background: var(--surface2); }
+  .toc-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .toc-section { padding: 12px 20px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent2); font-weight: 700; }
+  .menu-btn { background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+
+  /* Slides */
+  .slides-container { position: fixed; top: 58px; left: 0; right: 0; bottom: 0; overflow-y: auto; padding: 40px; }
+  .slide { display: none; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.3s; }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  /* Slide content */
+  .slide h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .slide h2 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; color: var(--accent); }
+  .slide h3 { font-size: 16px; font-weight: 600; margin: 16px 0 8px; color: var(--accent3); }
+  .slide p { font-size: 14px; line-height: 1.7; color: var(--muted); margin-bottom: 12px; }
+  .slide .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+  .slide ul, .slide ol { margin: 8px 0 16px 24px; font-size: 14px; line-height: 1.8; color: var(--muted); }
+  .slide li { margin-bottom: 4px; }
+  .slide code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; color: var(--accent3); }
+  .slide pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 12px 0; overflow-x: auto; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; line-height: 1.6; color: var(--text); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .badge-blue { background: rgba(0,212,255,0.15); color: var(--accent); }
+  .badge-purple { background: rgba(124,58,237,0.15); color: var(--accent2); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--warn); }
+
+  /* Flowchart boxes */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 20px 0; }
+  .flow-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .flow-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; text-align: center; min-width: 140px; max-width: 260px; font-size: 13px; position: relative; }
+  .flow-box.highlight { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+  .flow-box.warn { border-color: var(--warn); }
+  .flow-box.danger { border-color: var(--danger); }
+  .flow-box.success { border-color: var(--accent3); }
+  .flow-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+  .flow-box .value { font-weight: 600; color: var(--text); }
+  .flow-arrow { color: var(--muted); font-size: 20px; margin: 4px 0; }
+  .flow-arrow-right { color: var(--muted); font-size: 20px; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
+  .card-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* Tables */
+  .tbl { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .tbl th { background: var(--surface2); padding: 8px 12px; text-align: left; font-weight: 600; color: var(--accent); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tbl td { padding: 8px 12px; border-bottom: 1px solid rgba(42,42,58,0.5); color: var(--muted); vertical-align: top; }
+  .tbl tr:hover td { background: rgba(0,212,255,0.02); }
+
+  /* Keyboard hints */
+  .kbd-hint { position: fixed; bottom: 16px; right: 24px; font-size: 11px; color: var(--muted); opacity: 0.5; }
+  kbd { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 6px; font-size: 11px; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .slides-container { padding: 20px; }
+    .sidebar { width: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<div class="nav">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+    <span class="nav-title">MAPS PROTOCOL GUIDE</span>
+  </div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()">&larr; Prev</button>
+    <span class="slide-counter" id="counter">1 / 16</span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next &rarr;</button>
+  </div>
+</div>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- Sidebar TOC -->
+<div class="sidebar" id="sidebar">
+  <div class="toc-section">Overview</div>
+  <div class="toc-item" data-slide="0">1. What is MAPS?</div>
+  <div class="toc-item" data-slide="1">2. MAPS in Windows Defender</div>
+  <div class="toc-item" data-slide="2">3. Architecture Overview</div>
+  <div class="toc-section">Protocol</div>
+  <div class="toc-item" data-slide="3">4. Bond Wire Format</div>
+  <div class="toc-item" data-slide="4">5. Bonded&lt;T&gt; Envelope</div>
+  <div class="toc-item" data-slide="5">6. HTTP Transport</div>
+  <div class="toc-section">Request Types</div>
+  <div class="toc-item" data-slide="6">7. File Scan Flow</div>
+  <div class="toc-item" data-slide="7">8. URL Reputation Flow</div>
+  <div class="toc-item" data-slide="8">9. Heartbeat System</div>
+  <div class="toc-item" data-slide="9">10. BAFS / Block at First Sight</div>
+  <div class="toc-item" data-slide="10">11. Sample Upload Flow</div>
+  <div class="toc-section">Responses</div>
+  <div class="toc-item" data-slide="11">12. Response Parsing</div>
+  <div class="toc-item" data-slide="12">13. FASTPATH Signatures</div>
+  <div class="toc-section">Advanced</div>
+  <div class="toc-item" data-slide="13">14. SpynetReport Schema (372 Fields)</div>
+  <div class="toc-item" data-slide="14">15. All Endpoints & Auth</div>
+  <div class="toc-item" data-slide="15">16. Attack Surface & Fuzzing</div>
+</div>
+
+<!-- Slides -->
+<div class="slides-container">
+
+<!-- SLIDE 0: What is MAPS? -->
+<div class="slide active" id="slide-0">
+  <h1>What is MAPS?</h1>
+  <p class="subtitle">Microsoft Active Protection Service — Windows Defender's Cloud Brain</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Purpose</div>
+      <div class="card-body">
+        MAPS is the cloud-based reputation and dynamic signature delivery system
+        behind Windows Defender. Every time Defender scans a file, it can query MAPS
+        to get a real-time verdict from Microsoft's cloud, including dynamic
+        "FASTPATH" signatures that bypass local signature updates.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Key Capabilities</div>
+      <div class="card-body">
+        <ul style="margin-left:16px">
+          <li>File reputation (hash-based cloud lookup)</li>
+          <li>URL/domain reputation checking</li>
+          <li>Dynamic signature delivery (FASTPATH)</li>
+          <li>Block at First Sight (zero-day protection)</li>
+          <li>Sample upload for cloud detonation</li>
+          <li>Heartbeat/telemetry collection</li>
+          <li>AMSI script content analysis</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>How Defender Uses MAPS</h2>
+  <div class="flow">
+    <div class="flow-box highlight">
+      <div class="label">Local Scan</div>
+      <div class="value">Defender scans file locally</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box">
+      <div class="label">Low-Fi Detection</div>
+      <div class="value">Local heuristic trigger (suspicious but not confirmed)</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight">
+      <div class="label">MAPS Query</div>
+      <div class="value">Send file hashes + metadata to cloud</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-row">
+      <div class="flow-box success">
+        <div class="label">Clean</div>
+        <div class="value">88 bytes response<br>No signatures</div>
+      </div>
+      <div class="flow-box danger">
+        <div class="label">Malicious</div>
+        <div class="value">~488 bytes response<br>FASTPATH + threat name</div>
+      </div>
+      <div class="flow-box warn">
+        <div class="label">Unknown</div>
+        <div class="value">SampleRequest<br>Upload file for detonation</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 1: MAPS in Defender -->
+<div class="slide" id="slide-1">
+  <h1>MAPS in Windows Defender</h1>
+  <p class="subtitle">How MAPS integrates with Microsoft Defender Antivirus — the cloud brain behind endpoint protection</p>
+
+  <h2>What is MAPS in the Defender Pipeline?</h2>
+  <p>MAPS (Microsoft Advanced Protection Service, formerly "SpyNet") is the cloud protection backend for Microsoft Defender Antivirus. It's not a separate product — it's the cloud component that every Defender installation communicates with to deliver real-time verdicts on suspicious files, URLs, and behaviors. When cloud protection is enabled (the default), Defender queries MAPS before allowing unknown executables to run.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Why MAPS Exists</div>
+      <div class="card-body">
+        Local signature databases can't keep up with the volume of new malware (400K+ new samples/day).
+        MAPS allows Microsoft to:<br>
+        &bull; Deliver verdicts on <strong>never-before-seen files</strong> in seconds<br>
+        &bull; Push <strong>dynamic FASTPATH signatures</strong> without waiting for definition updates<br>
+        &bull; Aggregate telemetry from <strong>billions of endpoints</strong> for ML-based detection<br>
+        &bull; Trigger <strong>cloud detonation</strong> (sandbox analysis) for suspicious unknowns
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Where MAPS Sits in the Stack</div>
+      <div class="card-body">
+        <strong>Layer 1:</strong> Local signatures (VDM database) — known threats<br>
+        <strong>Layer 2:</strong> Local heuristics/ML — suspicious behavior detection<br>
+        <strong>Layer 3:</strong> <span style="color:var(--accent)">MAPS cloud query</span> — real-time cloud verdict<br>
+        <strong>Layer 4:</strong> <span style="color:var(--accent)">FASTPATH delivery</span> — dynamic signature push<br>
+        <strong>Layer 5:</strong> <span style="color:var(--accent)">Cloud detonation</span> — sandbox analysis<br>
+        <strong>Layer 6:</strong> Behavior monitoring + AMSI — runtime protection
+      </div>
+    </div>
+  </div>
+
+  <h2>Defender Features Powered by MAPS</h2>
+  <table class="tbl">
+    <tr><th>Feature</th><th>MAPS Role</th><th>User Impact</th></tr>
+    <tr><td><strong>Cloud-Delivered Protection</strong></td><td>Real-time file reputation via hash lookup</td><td>Unknown files blocked/allowed in &lt;1 second</td></tr>
+    <tr><td><strong>Block at First Sight (BAFS)</strong></td><td>Synchronous cloud query with execution hold</td><td>Zero-day files blocked before first execution</td></tr>
+    <tr><td><strong>Emergency Dynamic Intelligence</strong></td><td>FASTPATH signature blobs pushed per-client</td><td>New threat protection in minutes vs hours</td></tr>
+    <tr><td><strong>Automatic Sample Submission</strong></td><td>Cloud requests file upload via SAS URI</td><td>Unknown files sent to Azure sandbox for analysis</td></tr>
+    <tr><td><strong>SmartScreen URL Filtering</strong></td><td>URL reputation queries via MAPS protocol</td><td>Phishing/malware URLs blocked in browser</td></tr>
+    <tr><td><strong>Network Protection</strong></td><td>Network connection telemetry to MAPS</td><td>C2/malicious IP connections detected</td></tr>
+    <tr><td><strong>AMSI Cloud Analysis</strong></td><td>Script content submitted for cloud verdict</td><td>Obfuscated PowerShell/VBS malware caught</td></tr>
+    <tr><td><strong>Tamper Protection Telemetry</strong></td><td>Heartbeat type 10 reports tampering</td><td>Alerts on attempts to disable Defender</td></tr>
+  </table>
+
+  <h2>MAPS Data Flow in Real-Time Protection</h2>
+  <div class="flow">
+    <div class="flow-row">
+      <div class="flow-box" style="border-color:var(--accent2)">
+        <div class="label">User Action</div>
+        <div class="value">Opens file / visits URL / runs script</div>
+      </div>
+      <div class="flow-arrow-right">&rarr;</div>
+      <div class="flow-box">
+        <div class="label">Local Scan</div>
+        <div class="value">Signatures + heuristics + ML model</div>
+      </div>
+      <div class="flow-arrow-right">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--warn)">
+        <div class="label">Low-Confidence?</div>
+        <div class="value">Suspicious but not confirmed</div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight" style="min-width:500px">
+      <div class="label">MAPS Cloud Query</div>
+      <div class="value">POST Bond payload to wdcp.microsoft.com &mdash; SHA256 + metadata + context</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-row">
+      <div class="flow-box success">
+        <div class="label">Clean (88B)</div>
+        <div class="value">Allow file to run</div>
+      </div>
+      <div class="flow-box danger">
+        <div class="label">Malicious (~488B)</div>
+        <div class="value">Block + FASTPATH sig<br>+ quarantine</div>
+      </div>
+      <div class="flow-box warn">
+        <div class="label">Need Sample</div>
+        <div class="value">Upload to Azure<br>sandbox for analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:16px">
+    <strong>Key stat:</strong> With cloud protection enabled (Windows 10 E5), emergency dynamic intelligence updates can deliver
+    fixes for malware within <strong>minutes</strong> instead of waiting for the next scheduled definition update.
+    Microsoft recommends keeping cloud protection <strong>always on</strong>.
+  </p>
+</div>
+
+<!-- SLIDE 2: Architecture -->
+<div class="slide" id="slide-2">
+  <h1>Architecture Overview</h1>
+  <p class="subtitle">End-to-end system architecture from client to cloud</p>
+
+  <div class="flow">
+    <div class="flow-row">
+      <div class="flow-box" style="border-color:var(--accent2)">
+        <div class="label">Windows Client</div>
+        <div class="value">MpSvc.dll / MpClient.dll</div>
+      </div>
+      <div class="flow-arrow-right">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--accent2)">
+        <div class="label">Engine</div>
+        <div class="value">mpengine.dll<br><small style="color:var(--muted)">Bond serialization</small></div>
+      </div>
+      <div class="flow-arrow-right">&rarr;</div>
+      <div class="flow-box" style="border-color:var(--accent2)">
+        <div class="label">Communication</div>
+        <div class="value">MpCommu.dll<br><small style="color:var(--muted)">HTTPS transport</small></div>
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight" style="min-width:400px">
+      <div class="label">HTTPS POST</div>
+      <div class="value">wdcp.microsoft.com/wdcp.svc/bond/submitreport</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-row">
+      <div class="flow-box success">
+        <div class="label">MAPS Cloud</div>
+        <div class="value">Reputation DB</div>
+      </div>
+      <div class="flow-box success">
+        <div class="label">Detonation</div>
+        <div class="value">Azure Sandbox</div>
+      </div>
+      <div class="flow-box success">
+        <div class="label">FASTPATH</div>
+        <div class="value">Dynamic Signatures</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Key DLLs (Reverse-Engineered)</h2>
+  <table class="tbl">
+    <tr><th>Component</th><th>DLL</th><th>Role</th></tr>
+    <tr><td>Engine</td><td><code>mpengine.dll</code></td><td>Bond schema definitions (372 fields), payload construction, FASTPATH parsing</td></tr>
+    <tr><td>Communication</td><td><code>MpCommu.dll</code></td><td>HTTP transport, version header encoding, TLS, endpoint selection</td></tr>
+    <tr><td>Service</td><td><code>MpSvc.dll</code></td><td>Heartbeat manager (12 subtypes), scan orchestration, scheduling</td></tr>
+    <tr><td>Client</td><td><code>MpClient.dll</code></td><td>WMI/COM interface, configuration, trigger exports</td></tr>
+  </table>
+</div>
+
+<!-- SLIDE 3: Bond Wire Format -->
+<div class="slide" id="slide-3">
+  <h1>Bond CompactBinaryV1 Wire Format</h1>
+  <p class="subtitle">Microsoft's binary serialization protocol — the wire format of all MAPS traffic</p>
+
+  <h2>Field Header Encoding</h2>
+  <pre>
+┌─────────┬──────────┐
+│ 7  6  5 │ 4 3 2 1 0│    1 byte field header
+├─────────┼──────────┤
+│  delta  │ bond_type│
+└─────────┴──────────┘
+
+delta 1-5:  field_id = previous_id + delta        (inline)
+delta 6:    field_id = next_byte                   (uint8 absolute)
+delta 7:    field_id = next_two_bytes              (uint16 LE absolute)</pre>
+
+  <h2>19 Bond Data Types</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Primitives</div>
+      <div class="card-body">
+        <code>BT_BOOL=2</code> (1 byte)<br>
+        <code>BT_UINT8=3</code> (1 byte)<br>
+        <code>BT_UINT16=4</code> (varint)<br>
+        <code>BT_UINT32=5</code> (varint)<br>
+        <code>BT_UINT64=6</code> (varint)<br>
+        <code>BT_FLOAT=7</code> (4 bytes LE)<br>
+        <code>BT_DOUBLE=8</code> (8 bytes LE)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Signed (ZigZag)</div>
+      <div class="card-body">
+        <code>BT_INT8=14</code> (zigzag byte)<br>
+        <code>BT_INT16=15</code> (zigzag varint)<br>
+        <code>BT_INT32=16</code> (zigzag varint)<br>
+        <code>BT_INT64=17</code> (zigzag varint)<br>
+        <br>
+        zigzag(n) = (n &lt;&lt; 1) ^ (n &gt;&gt; 63)<br>
+        <small>Maps signed → unsigned</small>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Complex</div>
+      <div class="card-body">
+        <code>BT_STRING=9</code> (varint len + UTF-8)<br>
+        <code>BT_WSTRING=18</code> (varint chars + UTF-16LE)<br>
+        <code>BT_STRUCT=10</code> (fields...BT_STOP)<br>
+        <code>BT_LIST=11</code> (type + count + values)<br>
+        <code>BT_SET=12</code> (same as list)<br>
+        <code>BT_MAP=13</code> (ktype+vtype+count)<br>
+        <code>BT_STOP=0</code> / <code>BT_STOP_BASE=1</code>
+      </div>
+    </div>
+  </div>
+
+  <h2>Varint Encoding</h2>
+  <pre>
+Value 300 (0x12C):
+  Byte 1: 0xAC  = 0b_1_0101100  (continuation + low 7 bits: 44)
+  Byte 2: 0x02  = 0b_0_0000010  (final + high bits: 2)
+  Result: (2 &lt;&lt; 7) | 44 = 256 + 44 = 300 ✓</pre>
+</div>
+
+<!-- SLIDE 4: Bonded<T> Envelope -->
+<div class="slide" id="slide-4">
+  <h1>Bonded&lt;T&gt; Envelope</h1>
+  <p class="subtitle">The outer wrapper that encapsulates all MAPS payloads</p>
+
+  <h2>Structure</h2>
+  <pre>
+<span style="color:var(--accent)">43 42 01 00</span>                    ← CB marshal header ("CB" + version 1)
+Outer Struct {
+  <span style="color:var(--accent3)">F5: STRING</span> = schema_name     ← "Microsoft.ProtectionServices.Entities.Raw.SpynetReportEntity"
+  <span style="color:var(--warn)">BT_STOP_BASE</span>                ← Base class terminator #1
+  <span style="color:var(--warn)">BT_STOP_BASE</span>                ← Base class terminator #2 (resets field counter)
+  F10: LIST&lt;LIST&lt;INT8&gt;&gt; = [[]] ← Runtime type info (empty)
+  <span style="color:var(--accent)">F20: STRUCT</span> {                  ← Inner payload wrapper
+    <span style="color:var(--accent3)">F5: STRING</span> = schema_name   ← Schema name repeated
+    <span style="color:var(--warn)">BT_STOP_BASE</span>              ← Base class terminator #1
+    <span style="color:var(--warn)">BT_STOP_BASE</span>              ← Base class terminator #2
+    <span style="color:#ff79c6">[SpynetReport fields...]</span>   ← Actual payload data
+  BT_STOP                       ← End inner struct
+}
+BT_STOP                         ← End outer struct</pre>
+
+  <h2>Key Schema Name</h2>
+  <pre>Microsoft.ProtectionServices.Entities.Raw.SpynetReportEntity</pre>
+  <p>This schema name is mandatory. The server validates it and returns HTTP 500 for unrecognized schemas.</p>
+
+  <h2>Binary Example (Heartbeat)</h2>
+  <pre>
+43 42 01 00                     ← "CB\x01\x00" marshal header
+A9 3D 4D 69 63 72 6F ...       ← F5 STRING: schema name (61 bytes)
+01                              ← BT_STOP_BASE
+01                              ← BT_STOP_BASE
+CB 0B 0E 01 00                  ← F10: LIST&lt;LIST&lt;INT8&gt;&gt; = [[]]
+EA 3D 4D 69 63 72 6F ...       ← F20.F5 STRING: schema name again
+01 01                           ← Two more BT_STOP_BASE
+[payload fields...]             ← SpynetReport Bond fields
+00                              ← BT_STOP (inner)
+00                              ← BT_STOP (outer)</pre>
+</div>
+
+<!-- SLIDE 5: HTTP Transport -->
+<div class="slide" id="slide-5">
+  <h1>HTTP Transport Layer</h1>
+  <p class="subtitle">HTTPS request/response format matching real Defender traffic</p>
+
+  <h2>Request Headers</h2>
+  <pre>
+POST /wdcp.svc/bond/submitreport HTTP/1.1
+Host: wdcp.microsoft.com
+Content-Type: <span style="color:var(--accent3)">application/bond</span>
+Accept: <span style="color:var(--accent3)">application/bond</span>
+Accept-Charset: utf-8
+User-Agent: <span style="color:var(--accent)">MpCommunication</span>
+Connection: Keep-Alive
+<span style="color:var(--warn)">X-MS-MAPS-CUSTOMERTYPE</span>: Consumer
+<span style="color:var(--warn)">X-MS-MAPS-OSVERSION</span>: a0000000065f4
+<span style="color:var(--warn)">X-MS-MAPS-PLATFORMVERSION</span>: 40012659a0005
+<span style="color:var(--warn)">X-MS-MAPS-ENGINEVERSION</span>: 10001659a0001
+Content-Length: &lt;size&gt;</pre>
+
+  <h2>Version Header Encoding</h2>
+  <p>Versions are packed as 64-bit hex: <code>(major&lt;&lt;48) | (minor&lt;&lt;32) | (build&lt;&lt;16) | revision</code></p>
+  <table class="tbl">
+    <tr><th>Version String</th><th>Hex Encoding</th><th>Type</th></tr>
+    <tr><td><code>10.0.26100</code></td><td><code>a0000000065f4</code></td><td>OS Version (3-part)</td></tr>
+    <tr><td><code>4.18.26010.5</code></td><td><code>40012659a0005</code></td><td>Platform Version</td></tr>
+    <tr><td><code>1.1.26010.1</code></td><td><code>10001659a0001</code></td><td>Engine Version</td></tr>
+  </table>
+
+  <h2>Authentication Modes</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">Consumer</span></div>
+      <div class="card-body">No auth header needed.<br><code>X-MS-MAPS-CUSTOMERTYPE: Consumer</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge badge-purple">Enterprise</span></div>
+      <div class="card-body"><code>Authorization: Bearer &lt;AAD_TOKEN&gt;</code><br>Client ID: <code>cab96880-db5b-...</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">Legacy (Dead)</span></div>
+      <div class="card-body">WS-Security UsernameToken<br>Path: <code>/WdCpSrvc.asmx</code> → 404</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: File Scan Flow -->
+<div class="slide" id="slide-6">
+  <h1>File Scan Flow</h1>
+  <p class="subtitle">Complete request/response cycle for cloud file reputation</p>
+
+  <div class="flow">
+    <div class="flow-box highlight">
+      <div class="label">Step 1</div>
+      <div class="value">Compute file hashes<br><small>SHA256 + SHA1 + MD5 + CRC32</small></div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight">
+      <div class="label">Step 2</div>
+      <div class="value">Build SpynetReport payload<br><small>Bond CB1 serialization</small></div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box" style="border-color:var(--accent2)">
+      <div class="label">Step 3</div>
+      <div class="value">Wrap in Bonded&lt;T&gt; envelope</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight">
+      <div class="label">Step 4</div>
+      <div class="value">POST to /wdcp.svc/bond/submitreport</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box success">
+      <div class="label">Step 5</div>
+      <div class="value">Parse Bond response → MAPSVerdict</div>
+    </div>
+  </div>
+
+  <h2>SpynetReport Payload Structure</h2>
+  <pre>
+SpynetReport {
+  F20:  Revision = LIST&lt;INT16&gt;[3]       ← Schema version
+  F30:  MachineGuid = STRING              ← Client identity (UUID4)
+  F40:  AvSigVersion = STRING             ← "1.445.126.0"
+  F60:  EngineVersion = STRING            ← "1.1.26010.1"
+  F150: OsVer = STRING                    ← "10.0.0.0"
+  F170: OsBuild = LIST&lt;UINT32&gt;[26100]
+  F200: GeoId = LIST&lt;INT32&gt;[244]         ← US
+  F300: AppVersion = STRING               ← "4.18.26010.5"
+  <span style="color:var(--accent)">F390: FileReportElements = LIST&lt;LIST&lt;STRUCT&gt;&gt;</span> [
+    FileReport {
+      F10: Revision = LIST&lt;INT16&gt;[1]
+      F20: Index = LIST&lt;INT16&gt;[1]
+      <span style="color:var(--accent3)">F30: CoreReport = LIST&lt;STRUCT&gt;</span> [{
+        F20: FileName = "malware.exe"
+        F30: FileSystem = "NTFS"
+        F40: Size = LIST&lt;INT64&gt;[file_size]
+        F80: MD5 = "44d88612fea..."
+        F90: SHA1 = "3395856ce81..."
+        F100: SHA256 = "275a021bbf..."
+        <span style="color:var(--danger)">F330: ReportType = "2"</span>  ← SYNC_LOWFI
+      }]
+    }
+  ]
+  F1050: EngineReportGuid = STRING (UUID)
+}</pre>
+</div>
+
+<!-- SLIDE 7: URL Reputation -->
+<div class="slide" id="slide-7">
+  <h1>URL Reputation Flow</h1>
+  <p class="subtitle">How Defender queries cloud for URL/domain safety ratings</p>
+
+  <div class="flow">
+    <div class="flow-box highlight">
+      <div class="label">Input</div>
+      <div class="value">URL string (e.g. https://example.com)</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box" style="border-color:var(--accent2)">
+      <div class="label">Report Type</div>
+      <div class="value">CoreReport.ReportType = 5 (URL_REPUTATION)</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight" style="min-width:350px">
+      <div class="label">UrlReport (F1542)</div>
+      <div class="value">UrlReportGuid + UrlList + SigSeq + SigSha</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box success">
+      <div class="label">Response</div>
+      <div class="value">UrlResponse with Determination + Confidence + TTL</div>
+    </div>
+  </div>
+
+  <h2>UrlReport Structure (F1542)</h2>
+  <pre>
+UrlReport = <span style="color:var(--danger)">LIST&lt;STRUCT&gt;</span>[1] {   ← Must be LIST, not STRUCT (HTTP 500 otherwise!)
+  F3:  UrlReportGuid = STRING (UUID)
+  F6:  UrlList = STRUCT {
+    F3: Urls = LIST&lt;STRUCT&gt; [
+      UrlElement {
+        F20: Url = "https://example.com"   ← Only field set by engine
+        <span style="color:var(--muted)">// F10: Order — NOT set by engine</span>
+        <span style="color:var(--muted)">// F21: Url_Scrubbed — NOT set by engine</span>
+      }
+    ]
+  }
+  F9:  UrlContext = STRUCT { ... }     ← Optional
+  F12: SigSeq = "0"                    ← Mandatory
+  F15: SigSha = ""                     ← Mandatory
+  <span style="color:var(--muted)">// F18: ReportOnly — omitted when querying</span>
+}</pre>
+
+  <h2>URL Response Fields</h2>
+  <table class="tbl">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td>Url</td><td>STRING</td><td>The queried URL</td></tr>
+    <tr><td>Determination</td><td>UINT8</td><td>0=Unknown, 1=Clean, 2=Malicious, 3=Phishing</td></tr>
+    <tr><td>Confidence</td><td>UINT8</td><td>0-100 confidence score</td></tr>
+    <tr><td>TTL</td><td>UINT8</td><td>Cache time-to-live (short)</td></tr>
+    <tr><td>TTLlong</td><td>UINT64</td><td>Extended TTL value</td></tr>
+  </table>
+</div>
+
+<!-- SLIDE 8: Heartbeat System -->
+<div class="slide" id="slide-8">
+  <h1>Heartbeat System</h1>
+  <p class="subtitle">12 heartbeat subtypes for connectivity, telemetry, and lifecycle events</p>
+
+  <h2>Report Type = 4 (HEARTBEAT)</h2>
+  <p>Heartbeat is indicated by <code>F90: IsHeartBeat = 1</code> in SpynetReport, plus <code>F920</code>/<code>F930</code> subtype fields.</p>
+
+  <table class="tbl">
+    <tr><th>Value</th><th>Name</th><th>Trigger</th></tr>
+    <tr><td><span class="badge badge-blue">0</span></td><td>STILL_ALIVE</td><td>Periodic timer (default)</td></tr>
+    <tr><td><span class="badge badge-green">1</span></td><td>SETUP</td><td>First run / initial setup</td></tr>
+    <tr><td><span class="badge badge-red">2</span></td><td>UNINSTALL</td><td>MpTriggerHeartbeatOnUninstall</td></tr>
+    <tr><td><span class="badge badge-red">3</span></td><td>ERROR</td><td>MpTriggerErrorHeartbeatReport</td></tr>
+    <tr><td><span class="badge badge-yellow">4</span></td><td>POLICY_CHANGE</td><td>Configuration/Group Policy update</td></tr>
+    <tr><td><span class="badge badge-blue">5</span></td><td>BROWSER</td><td>MpSendBrowserHeartbeat</td></tr>
+    <tr><td><span class="badge badge-purple">6</span></td><td>EXCLUSION</td><td>Exclusion list change</td></tr>
+    <tr><td><span class="badge badge-green">7</span></td><td>CLEANUP</td><td>Post-remediation cleanup</td></tr>
+    <tr><td><span class="badge badge-blue">8</span></td><td>SIGNATURE_UPDATE</td><td>After signature update</td></tr>
+    <tr><td><span class="badge badge-blue">9</span></td><td>PLATFORM_UPDATE</td><td>After platform/engine update</td></tr>
+    <tr><td><span class="badge badge-red">10</span></td><td>TAMPER_PROTECT</td><td>Tamper protection event</td></tr>
+    <tr><td><span class="badge badge-yellow">11</span></td><td>REBOOT</td><td>Post-reboot heartbeat</td></tr>
+  </table>
+
+  <h2>Heartbeat Bond Fields</h2>
+  <pre>
+F90:  IsHeartBeat = UINT8(1)           ← Flags this as heartbeat
+F920: StillAliveHB = LIST&lt;UINT8&gt;[type] ← Heartbeat subtype (0-11)
+F930: HBControlGroup = LIST&lt;UINT8&gt;[0]  ← A/B test group
+F940: HBSubtype = UINT8                ← Additional subtype info
+F290: Membership = "2"                 ← Report type string</pre>
+</div>
+
+<!-- SLIDE 9: BAFS -->
+<div class="slide" id="slide-9">
+  <h1>Block at First Sight (BAFS)</h1>
+  <p class="subtitle">Zero-tolerance cloud blocking for unknown files</p>
+
+  <div class="flow">
+    <div class="flow-box danger">
+      <div class="label">Trigger</div>
+      <div class="value">Unknown file + CloudBlockLevel = 6 (ZERO_TOLERANCE)</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight">
+      <div class="label">Report Type</div>
+      <div class="value">SYNC_LOWFI (2) — synchronous blocking query</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box" style="border-color:var(--accent2)">
+      <div class="label">Cloud Verdict</div>
+      <div class="value">Server blocks file execution until verdict arrives</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-row">
+      <div class="flow-box success">
+        <div class="label">Allow</div>
+        <div class="value">No FASTPATH → file runs</div>
+      </div>
+      <div class="flow-box danger">
+        <div class="label">Block</div>
+        <div class="value">FASTPATH delivered → quarantine</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Cloud Block Levels</h2>
+  <table class="tbl">
+    <tr><th>Level</th><th>Value</th><th>Behavior</th></tr>
+    <tr><td><span class="badge badge-blue">OFF/DEFAULT</span></td><td>0</td><td>No cloud checking</td></tr>
+    <tr><td><span class="badge badge-green">MODERATE</span></td><td>1</td><td>Normal blocking threshold</td></tr>
+    <tr><td><span class="badge badge-yellow">HIGH</span></td><td>2</td><td>Aggressive blocking (default for MAPS)</td></tr>
+    <tr><td><span class="badge badge-red">HIGH_PLUS</span></td><td>4</td><td>Very aggressive blocking</td></tr>
+    <tr><td><span class="badge badge-red">ZERO_TOLERANCE</span></td><td>6</td><td>Maximum sensitivity — BAFS mode</td></tr>
+  </table>
+  <p>Note: Values 3, 5, 7+ are not documented. The fuzzer probes these gaps for hidden behavior.</p>
+</div>
+
+<!-- SLIDE 10: Sample Upload -->
+<div class="slide" id="slide-10">
+  <h1>Sample Upload Flow</h1>
+  <p class="subtitle">Cloud-triggered file upload to Azure Blob Storage for detonation</p>
+
+  <div class="flow">
+    <div class="flow-box highlight">
+      <div class="label">Step 1</div>
+      <div class="value">Send file scan report</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box warn">
+      <div class="label">Step 2</div>
+      <div class="value">Server responds with SampleRequest</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box" style="border-color:var(--accent2);min-width:400px">
+      <div class="label">SampleRequest Fields</div>
+      <div class="value" style="text-align:left;font-size:12px">
+        F3: RequestGuid (STRING)<br>
+        F6: SHA1 (STRING)<br>
+        F12: <strong>BlobSasUri</strong> — Azure upload URL with SAS token<br>
+        F15: TTL (UINT64)<br>
+        F18: Compression ("gzip")<br>
+        F21: UseQuarantine (BOOL)
+      </div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box highlight">
+      <div class="label">Step 3</div>
+      <div class="value">HTTP PUT file bytes to BlobSasUri</div>
+    </div>
+    <div class="flow-arrow">&darr;</div>
+    <div class="flow-box success">
+      <div class="label">Step 4</div>
+      <div class="value">Azure sandbox detonates file → verdicts published</div>
+    </div>
+  </div>
+
+  <h2>Upload Headers</h2>
+  <pre>
+PUT &lt;blob_sas_uri&gt; HTTP/1.1
+Content-Type: application/octet-stream
+x-ms-blob-type: BlockBlob
+Content-Encoding: gzip              ← If compression requested
+x-ms-meta-compression: gzip
+Content-Length: &lt;size&gt;</pre>
+</div>
+
+<!-- SLIDE 11: Response Parsing -->
+<div class="slide" id="slide-11">
+  <h1>Response Parsing</h1>
+  <p class="subtitle">Decoding the Bond response from MAPS cloud</p>
+
+  <h2>Response Schema</h2>
+  <pre>
+SubmitSpynetReportResult {
+  F5: Schema = "Microsoft.ProtectionServices.Entities.Raw.SubmitSpynetReportResult"
+  F6: SpynetReportResponse = LIST&lt;STRUCT&gt;[1] {
+    <span style="color:var(--accent)">F3:  Revision</span> = UINT8(5)              ← Protocol version
+    <span style="color:var(--accent)">F6:  SampleRate</span> = INT32(1)            ← Telemetry sampling
+    <span style="color:var(--accent3)">F9:  SampleRequests</span> = LIST&lt;STRUCT&gt;   ← Upload requests (if any)
+    <span style="color:var(--danger)">F12: SignaturePatches</span> = LIST&lt;STRUCT&gt;  ← FASTPATH signatures!
+    <span style="color:var(--accent)">F15: UrlResponse</span> = STRUCT             ← URL reputation result
+    <span style="color:var(--danger)">F18: ThreatDetailElements</span> = LIST&lt;STRUCT&gt;
+    <span style="color:var(--accent2)">F21: CertificateResponse</span> = STRUCT
+    <span style="color:var(--accent2)">F24: OnboardingResponse</span> = STRUCT
+  }
+  F10: RuntimeType = STRUCT             ← Runtime type info
+}</pre>
+
+  <h2>Verdict Logic</h2>
+  <div class="grid-3">
+    <div class="card" style="border-color:var(--accent3)">
+      <div class="card-title" style="color:var(--accent3)">CLEAN</div>
+      <div class="card-body">
+        Response has Revision + SampleRate<br>
+        but <strong>NO</strong> SignaturePatches or ThreatDetails.<br><br>
+        Typical size: <strong>88 bytes</strong>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--danger)">
+      <div class="card-title" style="color:var(--danger)">MALICIOUS</div>
+      <div class="card-body">
+        SignaturePatches present (FASTPATH blob)<br>
+        OR ThreatDetails with threat ID/name.<br><br>
+        Typical size: <strong>~488 bytes</strong>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--warn)">
+      <div class="card-title" style="color:var(--warn)">SAMPLE REQUESTED</div>
+      <div class="card-body">
+        SampleRequests list present with<br>
+        BlobSasUri for Azure upload.<br><br>
+        Cloud wants the file!
+      </div>
+    </div>
+  </div>
+
+  <h2>Response Sizes</h2>
+  <table class="tbl">
+    <tr><th>Scenario</th><th>Size</th><th>Contents</th></tr>
+    <tr><td>Clean / unknown file</td><td>88 bytes</td><td>Revision=5, SampleRate=1</td></tr>
+    <tr><td>Known threat + FASTPATH</td><td>~488 bytes</td><td>88 base + 385B FASTPATH blob</td></tr>
+    <tr><td>Known threat (cached)</td><td>88 bytes</td><td>FASTPATH already delivered to this GUID</td></tr>
+  </table>
+</div>
+
+<!-- SLIDE 12: FASTPATH Signatures -->
+<div class="slide" id="slide-12">
+  <h1>FASTPATH Dynamic Signatures</h1>
+  <p class="subtitle">VDM TLV format — real-time threat definitions delivered from cloud</p>
+
+  <h2>TLV Entry Format</h2>
+  <pre>
+┌──────────┬──────────┬───────────┬──────────────────┐
+│ type (1) │ size_lo  │ size_hi   │ payload (size)   │
+│  1 byte  │  1 byte  │  2 bytes  │  variable        │
+└──────────┴──────────┴───────────┴──────────────────┘
+size = size_lo | (size_hi &lt;&lt; 8)   ← 24-bit little-endian</pre>
+
+  <h2>Known Entry Types</h2>
+  <table class="tbl">
+    <tr><th>Type</th><th>Name</th><th>Description</th></tr>
+    <tr><td><code>0x5C</code></td><td><span class="badge badge-red">THREAT_BEGIN</span></td><td>Start of threat group: ThreatID (4B) + Flags (4B) + DetectionName</td></tr>
+    <tr><td><code>0x5D</code></td><td>THREAT_END</td><td>End of threat group: ThreatID (4B)</td></tr>
+    <tr><td><code>0x67</code></td><td><span class="badge badge-blue">STATIC</span></td><td>Hash-based detection: CRC32 + MD5 + SHA1</td></tr>
+    <tr><td><code>0x80</code></td><td>KCRCE</td><td>CRC-based detection entry</td></tr>
+    <tr><td><code>0xAA</code></td><td><span class="badge badge-green">FASTPATH_DATA</span></td><td>Metadata: compilation timestamp + config flags</td></tr>
+    <tr><td><code>0xAB</code></td><td>FASTPATH_SDN</td><td>Static Detection Name</td></tr>
+    <tr><td><code>0xD8</code></td><td>FASTPATH_TDN</td><td>Threat Detection Name</td></tr>
+    <tr><td><code>0xDA</code></td><td>FASTPATH_SDN_EX</td><td>Extended SDN</td></tr>
+    <tr><td><code>0xEC</code></td><td><span class="badge badge-purple">ENVELOPE</span></td><td>Encrypted detection logic (AES, 256B typical)</td></tr>
+    <tr><td><code>0xEE</code></td><td>OUTER_WRAPPER</td><td>V3 FASTPATH outer type with stream headers</td></tr>
+  </table>
+
+  <h2>EICAR Response Example (385 bytes)</h2>
+  <pre>
+<span style="color:var(--accent2)">[0xEC ENVELOPE]</span>     256 bytes — Encrypted detection logic (RSA-2048 + AES)
+<span style="color:var(--accent3)">[0xAA FASTPATH_DATA]</span>  20 bytes — Compilation timestamp, config flags
+<span style="color:var(--danger)">[0x5C THREAT_BEGIN]</span>   47 bytes — ThreatID=2147519003
+                                    "Virus:DOS/EICAR_Test_File"
+<span style="color:var(--accent)">[0x67 STATIC]</span>         38 bytes — SHA1 + MD5 + CRC32 of EICAR
+[0x5D THREAT_END]      4 bytes — ThreatID=2147519003 (closing)</pre>
+</div>
+
+<!-- SLIDE 13: SpynetReport Schema -->
+<div class="slide" id="slide-13">
+  <h1>SpynetReport Schema</h1>
+  <p class="subtitle">372 Bond fields reverse-engineered from mpengine.dll RTTI vtable analysis</p>
+
+  <h2>Top-Level Fields (Key Selection)</h2>
+  <table class="tbl">
+    <tr><th>Ordinal</th><th>Name</th><th>Type</th><th>Purpose</th></tr>
+    <tr><td>F10</td><td>ReportTime</td><td>INT64</td><td>.NET DateTime ticks</td></tr>
+    <tr><td>F20</td><td>Revision</td><td>LIST&lt;INT16&gt;</td><td>Schema version (3)</td></tr>
+    <tr><td>F30</td><td>MachineGuid</td><td>STRING</td><td>Client UUID identity</td></tr>
+    <tr><td>F40-F80</td><td>Version strings</td><td>STRING</td><td>AV sig, engine, NRI versions</td></tr>
+    <tr><td>F90</td><td>IsHeartBeat</td><td>UINT8</td><td>Heartbeat flag</td></tr>
+    <tr><td>F150-F220</td><td>System info</td><td>mixed</td><td>OS, geo, locale, CPU</td></tr>
+    <tr><td>F280</td><td>ProductGuid</td><td>STRING</td><td>Session GUID</td></tr>
+    <tr><td><strong>F390</strong></td><td><strong>FileReportElements</strong></td><td>LIST&lt;LIST&lt;STRUCT&gt;&gt;</td><td>File scan reports</td></tr>
+    <tr><td>F580</td><td>IsMsftInternal</td><td>UINT8</td><td>Microsoft internal flag</td></tr>
+    <tr><td>F590</td><td>TestHook</td><td>STRING</td><td>Test/debug hook</td></tr>
+    <tr><td>F920-F940</td><td>Heartbeat fields</td><td>mixed</td><td>HB type, control group</td></tr>
+    <tr><td>F1190</td><td>NetworkConnElements</td><td>LIST&lt;STRUCT&gt;</td><td>Network telemetry V1</td></tr>
+    <tr><td>F1275</td><td>AmsiUacInfos</td><td>LIST&lt;STRUCT&gt;</td><td>UAC elevation telemetry</td></tr>
+    <tr><td>F1373</td><td>CloudBlockLevel</td><td>UINT32</td><td>Block sensitivity</td></tr>
+    <tr><td><strong>F1542</strong></td><td><strong>UrlReport</strong></td><td>LIST&lt;STRUCT&gt;</td><td>URL reputation query</td></tr>
+  </table>
+
+  <h2>Nested Schema Classes</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">FileReport (12 fields)</div>
+      <div class="card-body">Revision, Index, CoreReport, PrevalentFileRpt, ParentIndices, ChildIndices, CollectReason</div>
+    </div>
+    <div class="card">
+      <div class="card-title">CoreReport (239 fields)</div>
+      <div class="card-body">FileName, Hashes (MD5/SHA1/SHA256/CRC), ReportType, ThreatID, AMSI fields, Signer, ImpHash</div>
+    </div>
+    <div class="card">
+      <div class="card-title">UrlReport (6 fields)</div>
+      <div class="card-body">UrlReportGuid, UrlList, UrlContext, SigSeq, SigSha, ReportOnly</div>
+    </div>
+    <div class="card">
+      <div class="card-title">ThreatDetails (11 fields)</div>
+      <div class="card-body">ThreatID, Category, Name, Severity, Advice, SigInfoElements, DropType, TTL</div>
+    </div>
+    <div class="card">
+      <div class="card-title">AmsiUacInfo (30 fields)</div>
+      <div class="card-body">Type, Identifier, Blocked, TrustedState, ExeAppName, CmdLine, COM/MSI/ActiveX/PkApp</div>
+    </div>
+    <div class="card">
+      <div class="card-title">NetworkConnV2 (21 fields)</div>
+      <div class="card-body">IPv4/IPv6, Ports, Protocol, Direction, Bytes in/out, URI</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14: Endpoints & Auth -->
+<div class="slide" id="slide-14">
+  <h1>All Endpoints & Authentication</h1>
+  <p class="subtitle">Complete endpoint map with geo-affinity and failover</p>
+
+  <h2>Primary Endpoints</h2>
+  <table class="tbl">
+    <tr><th>Endpoint</th><th>URL</th><th>Purpose</th></tr>
+    <tr><td><span class="badge badge-green">Production</span></td><td><code>wdcp.microsoft.com</code></td><td>Main MAPS cloud</td></tr>
+    <tr><td><span class="badge badge-blue">Failover</span></td><td><code>wdcpalt.microsoft.com</code></td><td>Backup if primary fails</td></tr>
+    <tr><td><span class="badge badge-yellow">Pre-Production</span></td><td><code>fastpath.wdcpppe.microsoft.com</code></td><td>Testing/PPE environment</td></tr>
+    <tr><td><span class="badge badge-purple">FASTPATH Prod</span></td><td><code>fastpath.wdcp.microsoft.com</code></td><td>Dynamic signature delivery</td></tr>
+    <tr><td><span class="badge badge-purple">FASTPATH PPE</span></td><td><code>fastpath.wdcpppe.microsoft.com</code></td><td>Testing signatures</td></tr>
+  </table>
+
+  <h2>Geo-Affinity Endpoints (Data Residency)</h2>
+  <div class="grid-2">
+    <div class="card"><div class="card-title">US</div><div class="card-body"><code>unitedstates.cp.wd.microsoft.com</code></div></div>
+    <div class="card"><div class="card-title">EU</div><div class="card-body"><code>europe.cp.wd.microsoft.com</code></div></div>
+    <div class="card"><div class="card-title">UK</div><div class="card-body"><code>unitedkingdom.cp.wd.microsoft.com</code></div></div>
+    <div class="card"><div class="card-title">AU</div><div class="card-body"><code>australia.cp.wd.microsoft.com</code></div></div>
+  </div>
+
+  <h2>API Paths</h2>
+  <table class="tbl">
+    <tr><th>Path</th><th>Protocol</th><th>Status</th></tr>
+    <tr><td><code>/wdcp.svc/bond/submitreport</code></td><td>Bond CompactBinaryV1</td><td><span class="badge badge-green">Active</span></td></tr>
+    <tr><td><code>/wdcp.svc/submitReport</code></td><td>Legacy REST</td><td><span class="badge badge-yellow">Unknown</span></td></tr>
+    <tr><td><code>/wdcp.svc/entraReport</code></td><td>Entra ID/Enterprise</td><td><span class="badge badge-purple">Enterprise</span></td></tr>
+    <tr><td><code>/WdCpSrvc.asmx</code></td><td>WS-Security SOAP</td><td><span class="badge badge-red">Dead (404)</span></td></tr>
+  </table>
+</div>
+
+<!-- SLIDE 15: Attack Surface & Fuzzing -->
+<div class="slide" id="slide-15">
+  <h1>Attack Surface & Fuzzing Targets</h1>
+  <p class="subtitle">Where to look for hidden features, undocumented behavior, and security gaps</p>
+
+  <h2>Fuzzer Modules (fuzz_maps.py)</h2>
+  <table class="tbl">
+    <tr><th>Module</th><th>What It Probes</th><th>Looking For</th></tr>
+    <tr><td><code>hidden</code></td><td>IsMsftInternal, TestHook, IsBeta, QueryOnly, MapsOrigin, VdiType, IsPassiveMode, AsimovDeviceTicket, PartnerGuid, multi-file, compression</td><td>Hidden features unlocked by flags</td></tr>
+    <tr><td><code>paths</code></td><td>70+ URL paths</td><td>Undiscovered WCF/REST endpoints</td></tr>
+    <tr><td><code>report-types</code></td><td>ReportType 0-65535</td><td>Undocumented report types beyond 1-7</td></tr>
+    <tr><td><code>headers</code></td><td>50+ HTTP header variations</td><td>Debug/preview/insider header gates</td></tr>
+    <tr><td><code>fields</code></td><td>200+ SpynetReport field ordinals</td><td>Server reaction to unknown fields</td></tr>
+    <tr><td><code>schemas</code></td><td>20+ Bond schema names</td><td>Alternative schema acceptance</td></tr>
+    <tr><td><code>endpoints</code></td><td>25+ hostname variations</td><td>Undiscovered regional endpoints</td></tr>
+    <tr><td><code>versions</code></td><td>OS, engine, platform, sig versions</td><td>Version-gated features</td></tr>
+    <tr><td><code>customer-types</code></td><td>30+ customer type values</td><td>Role-gated functionality</td></tr>
+    <tr><td><code>block-levels</code></td><td>CloudBlockLevel 0-255</td><td>Undocumented sensitivity levels</td></tr>
+    <tr><td><code>heartbeat-types</code></td><td>HeartbeatType 0-255</td><td>Undocumented heartbeat subtypes</td></tr>
+    <tr><td><code>bond-types</code></td><td>Wire type mismatches</td><td>Parser edge cases and crashes</td></tr>
+    <tr><td><code>response-fields</code></td><td>Diverse requests → response analysis</td><td>Novel response field ordinals</td></tr>
+  </table>
+
+  <h2>High-Value Targets for Hidden Features</h2>
+  <div class="grid-2">
+    <div class="card" style="border-color:var(--danger)">
+      <div class="card-title">F580: IsMsftInternal</div>
+      <div class="card-body">UINT8 flag — does setting this to 1 unlock extended diagnostics, verbose responses, or internal-only features?</div>
+    </div>
+    <div class="card" style="border-color:var(--danger)">
+      <div class="card-title">F590: TestHook</div>
+      <div class="card-body">STRING field — what values does the server recognize? Could enable debug/trace modes, bypass checks, or return extended data.</div>
+    </div>
+    <div class="card" style="border-color:var(--warn)">
+      <div class="card-title">F340: QueryOnly</div>
+      <div class="card-body">STRING field — may toggle a read-only mode that returns reputation without telemetry side effects.</div>
+    </div>
+    <div class="card" style="border-color:var(--warn)">
+      <div class="card-title">F690: MapsOrigin</div>
+      <div class="card-body">STRING — "mdatp", "intune", "sccm" etc. May route to different backends or unlock enterprise-specific features.</div>
+    </div>
+    <div class="card" style="border-color:var(--accent2)">
+      <div class="card-title">CloudBlockLevel 3,5,7-15</div>
+      <div class="card-body">Known: 0,1,2,4,6. The gaps (3,5,7+) may map to undocumented sensitivity levels or special modes.</div>
+    </div>
+    <div class="card" style="border-color:var(--accent2)">
+      <div class="card-title">ReportType 8+</div>
+      <div class="card-body">Known: 1-7. Higher values may map to behavior reports, certificate queries, or preview features.</div>
+    </div>
+  </div>
+
+  <h2>Running the Fuzzer</h2>
+  <pre>
+# Quick test — hidden feature probes
+python fuzz_maps.py hidden
+
+# Full sweep with proxy inspection
+python fuzz_maps.py --proxy http://127.0.0.1:8080 --no-verify --verbose all
+
+# Specific module with slow rate
+python fuzz_maps.py --delay 2.0 fields
+
+# Pre-production endpoint (more permissive)
+python fuzz_maps.py --ppe report-types</pre>
+</div>
+
+</div><!-- /slides-container -->
+
+<div class="kbd-hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>T</kbd> toggle TOC</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const tocItems = document.querySelectorAll('.toc-item');
+let current = 0;
+
+function showSlide(n) {
+  if (n < 0 || n >= slides.length) return;
+  slides[current].classList.remove('active');
+  slides[n].classList.add('active');
+  current = n;
+  document.getElementById('counter').textContent = `${current + 1} / ${slides.length}`;
+  document.getElementById('progressBar').style.width = `${((current + 1) / slides.length) * 100}%`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === slides.length - 1;
+  tocItems.forEach(t => t.classList.remove('active'));
+  tocItems[current]?.classList.add('active');
+}
+
+function nextSlide() { showSlide(current + 1); }
+function prevSlide() { showSlide(current - 1); }
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+tocItems.forEach(item => {
+  item.addEventListener('click', () => {
+    showSlide(parseInt(item.dataset.slide));
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 't' || e.key === 'T') toggleSidebar();
+});
+
+// Touch support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (dx > 50) prevSlide();
+  if (dx < -50) nextSlide();
+});
+
+showSlide(0);
+</script>
+</body>
+</html>

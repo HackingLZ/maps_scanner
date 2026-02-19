@@ -1,0 +1,8 @@
+# Required
+requests>=2.28.0
+
+# Optional - enhanced PE analysis
+# pefile>=2023.2.7
+
+# Optional - fuzzy hashing
+# ssdeep>=3.4
