@@ -747,10 +747,10 @@ def main():
 
     print(f"Created {len(created)} test files in {TEST_DIR}/")
     print("\nUsage examples:")
-    print(f"  python -m tools.maps_scanner --no-verify scan {created[0]}")
-    print(f"  python -m tools.maps_scanner --no-verify scan {created[0]} --threat-id 2147519003")
-    print(f"  python -m tools.maps_scanner --no-verify scan {created[3]}")
-    print(f"  python -m tools.maps_scanner --no-verify upload {created[4]}")
+    print(f"  ./maps_scanner --no-verify scan {created[0]}")
+    print(f"  ./maps_scanner --no-verify scan {created[0]} --threat-id 2147519003")
+    print(f"  ./maps_scanner --no-verify scan {created[3]}")
+    print(f"  ./maps_scanner --no-verify upload {created[4]}")
 
 
 if __name__ == "__main__":

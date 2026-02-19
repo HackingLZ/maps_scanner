@@ -13,7 +13,7 @@ a fresh `--machine-guid`, MAPS delivers a FASTPATH dynamic signature.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify \
+./maps_scanner --no-verify \
     --machine-guid "$(python3 -c 'import uuid; print(uuid.uuid4())')" \
     scan /tmp/eicar_test.com --threat-id 2147519003
 ```
@@ -84,7 +84,7 @@ Unknown/clean files get a minimal response with just protocol metadata.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify scan random_data.bin
+./maps_scanner --no-verify scan random_data.bin
 ```
 
 ### JSON Output
@@ -117,7 +117,7 @@ A minimal valid PE (just `ret` instruction) is treated as unknown/clean.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify scan minimal_test.exe
+./maps_scanner --no-verify scan minimal_test.exe
 ```
 
 ### Text Output
@@ -143,7 +143,7 @@ requires STREAM_ATTRIBUTE submission (not yet implemented).
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify scan test_script.ps1
+./maps_scanner --no-verify scan test_script.ps1
 ```
 
 ### Text Output
@@ -167,7 +167,7 @@ Query by SHA-256 without a local file. Same response format as file scan.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify scan-hash \
+./maps_scanner --no-verify scan-hash \
     275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
 ```
 
@@ -202,7 +202,7 @@ detection sensitivity.
 ### Command (Blocked)
 
 ```bash
-python -m tools.maps_scanner --no-verify \
+./maps_scanner --no-verify \
     --machine-guid "$(python3 -c 'import uuid; print(uuid.uuid4())')" \
     bafs /tmp/eicar_test.com --threat-id 2147519003
 ```
@@ -233,7 +233,7 @@ Schema:         Microsoft.ProtectionServices.Entities.Raw.SubmitSpynetReportResu
 ### Command (Allowed)
 
 ```bash
-python -m tools.maps_scanner --no-verify bafs random_data.bin
+./maps_scanner --no-verify bafs random_data.bin
 ```
 
 ### Text Output
@@ -257,7 +257,7 @@ Tests MAPS connectivity and reports client configuration.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify heartbeat
+./maps_scanner --no-verify heartbeat
 ```
 
 ### Text Output
@@ -286,10 +286,10 @@ Schema:         Microsoft.ProtectionServices.Entities.Raw.SubmitSpynetReportResu
 
 ```bash
 # Setup heartbeat (type 1)
-python -m tools.maps_scanner --no-verify heartbeat --type 1
+./maps_scanner --no-verify heartbeat --type 1
 
 # Signature update heartbeat (type 8)
-python -m tools.maps_scanner --no-verify heartbeat --type 8
+./maps_scanner --no-verify heartbeat --type 8
 
 # All supported types: 0=StillAlive, 1=Setup, 2=Uninstall, 3=Error,
 # 4=PolicyChange, 5=Browser, 6=Exclusion, 7=Cleanup, 8=SigUpdate,
@@ -320,7 +320,7 @@ Compute file metadata without contacting the MAPS cloud.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify analyze /tmp/eicar_test.com
+./maps_scanner --no-verify analyze /tmp/eicar_test.com
 ```
 
 ### Output
@@ -357,7 +357,7 @@ WDO reports use ReportType 7 for boot-time offline scan results.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify wdo suspicious.exe --threat-id 2147519003
+./maps_scanner --no-verify wdo suspicious.exe --threat-id 2147519003
 ```
 
 ### Text Output
@@ -383,13 +383,13 @@ Submit script content for cloud analysis via AMSI protocol fields.
 
 ```bash
 # Submit a PowerShell script
-python -m tools.maps_scanner --no-verify amsi script.ps1
+./maps_scanner --no-verify amsi script.ps1
 
 # Pipe from stdin
-echo 'Write-Host "Hello"' | python -m tools.maps_scanner --no-verify amsi -
+echo 'Write-Host "Hello"' | ./maps_scanner --no-verify amsi -
 
 # Specify host application
-python -m tools.maps_scanner --no-verify amsi script.vbs --app-id cscript.exe
+./maps_scanner --no-verify amsi script.vbs --app-id cscript.exe
 ```
 
 ### Text Output
@@ -444,13 +444,13 @@ Submit network connection telemetry using Bond_NetworkConnectionReport V1 schema
 
 ```bash
 # Report a TCP connection to example.com
-python -m tools.maps_scanner --no-verify netconn 93.184.216.34 443 --protocol TCP
+./maps_scanner --no-verify netconn 93.184.216.34 443 --protocol TCP
 
 # Report a UDP connection with source IP
-python -m tools.maps_scanner --no-verify netconn 8.8.8.8 53 --protocol UDP --source-ip 192.168.1.100
+./maps_scanner --no-verify netconn 8.8.8.8 53 --protocol UDP --source-ip 192.168.1.100
 
 # Report with URI
-python -m tools.maps_scanner --no-verify netconn 93.184.216.34 443 --uri "https://example.com/path"
+./maps_scanner --no-verify netconn 93.184.216.34 443 --uri "https://example.com/path"
 ```
 
 ### Text Output
@@ -488,13 +488,13 @@ Submit UAC elevation telemetry using Bond_AmsiUacInfo schema
 
 ```bash
 # Report a UAC elevation for cmd.exe
-python -m tools.maps_scanner --no-verify uac --exe cmd.exe --uac-type 0
+./maps_scanner --no-verify uac --exe cmd.exe --uac-type 0
 
 # Report with full details
-python -m tools.maps_scanner --no-verify uac --exe powershell.exe --cmdline "powershell -ep bypass" --uac-type 0 --blocked
+./maps_scanner --no-verify uac --exe powershell.exe --cmdline "powershell -ep bypass" --uac-type 0 --blocked
 
 # Report COM-type UAC (type 1)
-python -m tools.maps_scanner --no-verify uac --uac-type 1 --identifier "{some-clsid}"
+./maps_scanner --no-verify uac --uac-type 1 --identifier "{some-clsid}"
 ```
 
 ### Text Output
@@ -531,7 +531,7 @@ URL reputation queries now return HTTP 200 after fixing the UrlReport encoding.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify url https://example.com
+./maps_scanner --no-verify url https://example.com
 ```
 
 ### JSON Output
@@ -565,7 +565,7 @@ Enterprise mode adds Bearer token authentication for organizational MAPS access.
 ### Command
 
 ```bash
-python -m tools.maps_scanner --no-verify \
+./maps_scanner --no-verify \
     --bearer-token "eyJ..." \
     --customer-type Enterprise \
     scan suspicious.exe
@@ -586,7 +586,7 @@ Generate test files for exercising different scan scenarios.
 ### Command
 
 ```bash
-python -m tools.maps_scanner.tests.create_test_files
+python tests/create_test_files.py
 ```
 
 ### Output

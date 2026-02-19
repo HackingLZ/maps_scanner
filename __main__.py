@@ -460,36 +460,40 @@ def cmd_bafs(args, config: MAPSConfig, out: Output):
     tight timeout to simulate real Defender BAFS behavior. This is
     the highest-confidence cloud scan mode.
     """
-    # Override config for maximum BAFS sensitivity
+    # Override config for BAFS behavior.
     original_block = config.cloud_block_level
+    original_timeout = config.timeout
     config.cloud_block_level = args.block_level or 6  # Zero Tolerance by default
+    config.timeout = args.bafs_timeout
 
     client = MAPSClient(config)
 
-    out.info(f"BAFS scan: {args.file}")
-    file_info = client.analyze_file_local(args.file)
-    out.info(f"SHA-256: {file_info.sha256}")
-    out.info(f"Size: {file_info.size} bytes")
-    block_name = CloudBlockLevel(config.cloud_block_level).name if config.cloud_block_level in CloudBlockLevel.__members__.values() else str(config.cloud_block_level)
-    out.info(f"Block Level: {config.cloud_block_level} ({block_name})")
-    out.info(f"Timeout: {args.bafs_timeout}s")
-    out.info(f"Sending sync lowfi query to MAPS cloud...")
+    try:
+        out.info(f"BAFS scan: {args.file}")
+        file_info = client.analyze_file_local(args.file)
+        out.info(f"SHA-256: {file_info.sha256}")
+        out.info(f"Size: {file_info.size} bytes")
+        block_name = CloudBlockLevel(config.cloud_block_level).name if config.cloud_block_level in CloudBlockLevel.__members__.values() else str(config.cloud_block_level)
+        out.info(f"Block Level: {config.cloud_block_level} ({block_name})")
+        out.info(f"Timeout: {args.bafs_timeout}s")
+        out.info(f"Sending sync lowfi query to MAPS cloud...")
 
-    # Use scan with no threat_id (pure cloud-block mode)
-    verdict = client.scan_file(args.file, threat_id=args.threat_id)
+        # Use scan with no threat_id (pure cloud-block mode)
+        verdict = client.scan_file(args.file, threat_id=args.threat_id)
 
-    if not out.json_mode:
-        if verdict.is_malicious:
-            print(f"\n  \033[91mBLOCKED\033[0m by cloud (BAFS)")
-        elif verdict.clean:
-            print(f"\n  \033[92mALLOWED\033[0m by cloud (no threats)")
-        else:
-            print(f"\n  \033[93mINDETERMINATE\033[0m (timeout or error)")
+        if not out.json_mode:
+            if verdict.is_malicious:
+                print(f"\n  \033[91mBLOCKED\033[0m by cloud (BAFS)")
+            elif verdict.clean:
+                print(f"\n  \033[92mALLOWED\033[0m by cloud (no threats)")
+            else:
+                print(f"\n  \033[93mINDETERMINATE\033[0m (timeout or error)")
 
-    out.verdict(verdict)
-
-    # Restore
-    config.cloud_block_level = original_block
+        out.verdict(verdict)
+    finally:
+        # Restore overrides.
+        config.cloud_block_level = original_block
+        config.timeout = original_timeout
 
 
 def cmd_wdo(args, config: MAPSConfig, out: Output):
@@ -594,7 +598,19 @@ def cmd_netconn(args, config: MAPSConfig, out: Output):
     PROTO_MAP = {"tcp": 6, "udp": 17, "icmp": 1}
     proto = args.protocol
     if isinstance(proto, str):
-        proto = PROTO_MAP.get(proto.lower(), 6)
+        proto_lc = proto.strip().lower()
+        if proto_lc in PROTO_MAP:
+            proto = PROTO_MAP[proto_lc]
+        else:
+            try:
+                proto = int(proto_lc, 10)
+            except ValueError as e:
+                raise ValueError(
+                    f"Invalid protocol '{args.protocol}'. Use TCP, UDP, ICMP, or a numeric IANA value."
+                ) from e
+
+    if proto < 0 or proto > 0xFFFF:
+        raise ValueError(f"Invalid protocol '{args.protocol}'. Must be between 0 and 65535.")
 
     client = MAPSClient(config)
 
@@ -713,6 +729,7 @@ def cmd_config(args, config: MAPSConfig, out: Output):
         config.endpoint = args.set_endpoint
     if args.set_machine_guid:
         config.machine_guid = args.set_machine_guid
+        config.rotate_guid = False
     if args.set_proxy:
         config.proxy = args.set_proxy if args.set_proxy != "none" else None
     if args.set_block_level is not None:
@@ -728,6 +745,7 @@ def cmd_config(args, config: MAPSConfig, out: Output):
         d = {
             "endpoint": config.endpoint,
             "machine_guid": config.machine_guid,
+            "rotate_guid": config.rotate_guid,
             "partner_guid": config.partner_guid,
             "cloud_block_level": config.cloud_block_level,
             "spynet_level": config.spynet_level,
@@ -919,7 +937,7 @@ def build_parser() -> argparse.ArgumentParser:
     # build
     p_build = subparsers.add_parser("build", help="Build SpynetReport payload (no send)")
     p_build.add_argument("file", help="File to build report for")
-    p_build.add_argument("--threat-id", help="Lowfi threat ID")
+    p_build.add_argument("--threat-id", type=int, help="Lowfi threat ID")
     p_build.add_argument("-o", "--output", help="Write payload to file")
 
     # decode

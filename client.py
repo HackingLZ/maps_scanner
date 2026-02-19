@@ -3326,6 +3326,7 @@ def save_config(config: MAPSConfig):
         "os_type": config.os_type,
         "geo_id": config.geo_id,
         "customer_type": config.customer_type,
+        "rotate_guid": config.rotate_guid,
     }
     if config.bearer_token:
         data["bearer_token"] = config.bearer_token

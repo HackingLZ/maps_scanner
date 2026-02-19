@@ -107,7 +107,7 @@ Scan the EICAR test file with a known threat ID. With GUID rotation (default), e
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/eicar_test.com --threat-id 2147519003
+./maps_scanner --no-verify scan tests/samples/eicar_test.com --threat-id 2147519003
 ```
 
 #### Output (Text)
@@ -187,7 +187,7 @@ Schema:         Microsoft.ProtectionServices.Entities.Raw.SubmitSpynetReportResu
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/minimal_test.exe
+./maps_scanner --no-verify scan tests/samples/minimal_test.exe
 ```
 #### Output
 ```
@@ -205,7 +205,7 @@ Latency:        406.7 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/random_data.bin
+./maps_scanner --no-verify scan tests/samples/random_data.bin
 ```
 #### Output
 ```
@@ -221,7 +221,7 @@ Latency:        409.4 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/test_script.ps1
+./maps_scanner --no-verify scan tests/samples/test_script.ps1
 ```
 #### Output
 ```
@@ -237,7 +237,7 @@ Latency:        406.2 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/pe_with_imports.exe
+./maps_scanner --no-verify scan tests/samples/pe_with_imports.exe
 ```
 #### Output
 ```
@@ -253,7 +253,7 @@ Latency:        405.6 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/test_library.dll
+./maps_scanner --no-verify scan tests/samples/test_library.dll
 ```
 #### Output
 ```
@@ -269,7 +269,7 @@ Latency:        418.0 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/dotnet_test.exe
+./maps_scanner --no-verify scan tests/samples/dotnet_test.exe
 ```
 #### Output
 ```
@@ -287,7 +287,7 @@ Latency:        403.9 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/large_unique_test.exe
+./maps_scanner --no-verify scan tests/samples/large_unique_test.exe
 ```
 #### Output
 ```
@@ -303,7 +303,7 @@ Latency:        403.1 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/test_batch.cmd
+./maps_scanner --no-verify scan tests/samples/test_batch.cmd
 ```
 #### Output
 ```
@@ -319,7 +319,7 @@ Latency:        412.9 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/test_x64.exe
+./maps_scanner --no-verify scan tests/samples/test_x64.exe
 ```
 #### Output
 ```
@@ -337,7 +337,7 @@ PE with `.rsrc` section containing version information.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/versioned_test.exe
+./maps_scanner --no-verify scan tests/samples/versioned_test.exe
 ```
 #### Output
 ```
@@ -357,7 +357,7 @@ Query file reputation by SHA256 hash only (no file content submitted).
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan-hash \
+./maps_scanner --no-verify scan-hash \
   275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f \
   --name eicar_test.com --size 68
 ```
@@ -378,7 +378,7 @@ Latency:        474.9 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan-hash \
+./maps_scanner --no-verify scan-hash \
   b28a8b72e4755b87a9acf4ccf0c0afc91ee5eb379a14a02c3d54edfc65471377 \
   --name random_data.bin --size 4096
 ```
@@ -397,7 +397,7 @@ Latency:        128.4 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify url "https://example.com"
+./maps_scanner --no-verify url "https://example.com"
 ```
 
 #### Output (Text)
@@ -430,7 +430,7 @@ The `--referrer` flag sets the referring URL in the UrlReport Bond payload.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify url "https://example.com/test" --referrer "https://google.com"
+./maps_scanner --no-verify url "https://example.com/test" --referrer "https://google.com"
 ```
 
 #### Output
@@ -449,7 +449,7 @@ Default heartbeat: periodic connectivity check.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify heartbeat
+./maps_scanner --no-verify heartbeat
 ```
 
 #### Output
@@ -479,7 +479,7 @@ First-run/setup heartbeat.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify heartbeat --type 1
+./maps_scanner --no-verify heartbeat --type 1
 ```
 
 #### Output
@@ -499,7 +499,7 @@ Post-signature-update heartbeat.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify heartbeat --type 8
+./maps_scanner --no-verify heartbeat --type 8
 ```
 
 #### Output
@@ -521,7 +521,7 @@ Block at First Sight scan. Uses SyncLowfi (type 2) with zero-tolerance block lev
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify bafs tests/samples/unique_test.exe
+./maps_scanner --no-verify bafs tests/samples/unique_test.exe
 ```
 
 #### Output
@@ -558,7 +558,7 @@ BAFS with `--block-level 2` (HIGH instead of default ZERO_TOLERANCE).
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify bafs tests/samples/unique_test.exe --block-level 2
+./maps_scanner --no-verify bafs tests/samples/unique_test.exe --block-level 2
 ```
 
 #### Output
@@ -581,7 +581,7 @@ Submit a WDO scan report (ReportType 7) for boot-time scan results.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify wdo tests/samples/eicar_test.com
+./maps_scanner --no-verify wdo tests/samples/eicar_test.com
 ```
 
 #### Output (Text)
@@ -615,7 +615,7 @@ Submit script content via AMSI with default `powershell.exe` app ID.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify amsi tests/samples/test_script.ps1
+./maps_scanner --no-verify amsi tests/samples/test_script.ps1
 ```
 
 #### Output
@@ -649,7 +649,7 @@ AMSI with `--content-name` (Windows-style path reported to cloud) and `--session
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify amsi tests/samples/test_script.ps1 \
+./maps_scanner --no-verify amsi tests/samples/test_script.ps1 \
   --content-name "C:\Users\test\script.ps1" --session-id 42
 ```
 
@@ -672,7 +672,7 @@ Latency:        402.6 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify amsi tests/samples/test_script.vbs --app-id cscript.exe
+./maps_scanner --no-verify amsi tests/samples/test_script.vbs --app-id cscript.exe
 ```
 
 #### Output
@@ -690,7 +690,7 @@ Latency:        146.1 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify amsi tests/samples/test_script.js --app-id wscript.exe
+./maps_scanner --no-verify amsi tests/samples/test_script.js --app-id wscript.exe
 ```
 
 #### Output
@@ -710,7 +710,7 @@ Submit UAC elevation report for an executable (type 0).
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify uac --exe cmd.exe --uac-type 0
+./maps_scanner --no-verify uac --exe cmd.exe --uac-type 0
 ```
 
 #### Output
@@ -748,7 +748,7 @@ Submit UAC elevation report for a COM object (type 1) with CLSID identifier.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify uac --uac-type 1 \
+./maps_scanner --no-verify uac --uac-type 1 \
   --identifier "{3ad05575-8857-4850-9277-11b85bdb8e09}"
 ```
 
@@ -772,7 +772,7 @@ UAC report with `--auto-elevate` and `--blocked` flags set, plus `--cmdline`.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify uac --uac-type 0 \
+./maps_scanner --no-verify uac --uac-type 0 \
   --exe cmd.exe --cmdline "cmd.exe /c whoami" --auto-elevate --blocked
 ```
 
@@ -795,7 +795,7 @@ Latency:        388.6 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify netconn 93.184.216.34 443 --protocol TCP
+./maps_scanner --no-verify netconn 93.184.216.34 443 --protocol TCP
 ```
 
 #### Output
@@ -830,7 +830,7 @@ Latency:        109.5 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify netconn 8.8.8.8 53 --protocol UDP
+./maps_scanner --no-verify netconn 8.8.8.8 53 --protocol UDP
 ```
 
 #### Output
@@ -853,7 +853,7 @@ Test all netconn sub-flags: `--uri`, `--source-ip`, `--local-port`.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify netconn 93.184.216.34 443 \
+./maps_scanner --no-verify netconn 93.184.216.34 443 \
   --protocol TCP --uri "https://example.com/api" --source-ip 10.0.0.5 --local-port 54321
 ```
 
@@ -877,7 +877,7 @@ Attempt to upload a file sample to MAPS for detonation. The cloud must first req
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify upload tests/samples/large_unique_test.exe
+./maps_scanner --no-verify upload tests/samples/large_unique_test.exe
 ```
 
 #### Output
@@ -905,7 +905,7 @@ The `--compression gzip` flag enables gzip compression for the blob upload. The 
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify upload tests/samples/large_unique_test.exe --compression gzip
+./maps_scanner --no-verify upload tests/samples/large_unique_test.exe --compression gzip
 ```
 
 #### Output
@@ -939,7 +939,7 @@ tests/samples/random_data.bin
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify batch /tmp/batch_list.txt
+./maps_scanner --no-verify batch /tmp/batch_list.txt
 ```
 
 #### Output
@@ -960,7 +960,7 @@ JSON output gives full verdict details per file. With GUID rotation, EICAR relia
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify --json batch /tmp/batch_list.txt
+./maps_scanner --no-verify --json batch /tmp/batch_list.txt
 ```
 
 #### Output
@@ -1011,7 +1011,7 @@ Hash-only batch scan without cloud contact. Shows `UNKNOWN` since no cloud verdi
 
 #### Command
 ```bash
-python -m tools.maps_scanner batch /tmp/batch_list.txt --local-only
+./maps_scanner batch /tmp/batch_list.txt --local-only
 ```
 
 #### Output
@@ -1030,7 +1030,7 @@ Replay a previously captured Bond payload. Dry run by default (no `--confirm`), 
 
 #### Command
 ```bash
-python -m tools.maps_scanner replay /tmp/eicar_payload.bin
+./maps_scanner replay /tmp/eicar_payload.bin
 ```
 
 #### Output
@@ -1050,7 +1050,7 @@ Replay with `--confirm` actually sends the captured payload to the MAPS endpoint
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify replay /tmp/eicar_payload.bin --confirm
+./maps_scanner --no-verify replay /tmp/eicar_payload.bin --confirm
 ```
 
 #### Output
@@ -1074,7 +1074,7 @@ Compute file hashes and PE metadata without contacting the cloud. Same output as
 
 #### Command
 ```bash
-python -m tools.maps_scanner scan tests/samples/pe_with_imports.exe --local-only
+./maps_scanner scan tests/samples/pe_with_imports.exe --local-only
 ```
 
 #### Output
@@ -1099,7 +1099,7 @@ Section Hashes:
 
 #### Command
 ```bash
-python -m tools.maps_scanner analyze tests/samples/eicar_test.com
+./maps_scanner analyze tests/samples/eicar_test.com
 ```
 #### Output
 ```
@@ -1117,7 +1117,7 @@ CRC32:          6851cf3c
 
 #### Command
 ```bash
-python -m tools.maps_scanner analyze tests/samples/minimal_test.exe
+./maps_scanner analyze tests/samples/minimal_test.exe
 ```
 #### Output
 ```
@@ -1141,7 +1141,7 @@ Shows the import hash (ImpHash) computed from the PE import table.
 
 #### Command
 ```bash
-python -m tools.maps_scanner analyze tests/samples/pe_with_imports.exe
+./maps_scanner analyze tests/samples/pe_with_imports.exe
 ```
 #### Output
 ```
@@ -1165,7 +1165,7 @@ Section Hashes:
 
 #### Command
 ```bash
-python -m tools.maps_scanner analyze tests/samples/dotnet_test.exe
+./maps_scanner analyze tests/samples/dotnet_test.exe
 ```
 #### Output
 ```
@@ -1189,7 +1189,7 @@ Build a SpynetReport Bond binary payload without sending. Useful for inspecting 
 
 #### Command
 ```bash
-python -m tools.maps_scanner build tests/samples/eicar_test.com -o /tmp/eicar_payload.bin
+./maps_scanner build tests/samples/eicar_test.com -o /tmp/eicar_payload.bin
 ```
 
 #### Output
@@ -1224,7 +1224,7 @@ Decode a Bond CompactBinaryV1 binary payload. The `--schema request` option maps
 
 #### Command
 ```bash
-python -m tools.maps_scanner decode /tmp/eicar_payload.bin --schema request
+./maps_scanner decode /tmp/eicar_payload.bin --schema request
 ```
 
 #### Output
@@ -1241,7 +1241,7 @@ Decoding 809 bytes of Bond CompactBinaryV1...
 
 #### Command
 ```bash
-python -m tools.maps_scanner config
+./maps_scanner config
 ```
 
 #### Output
@@ -1297,7 +1297,7 @@ The `-v` flag shows decoded Bond response fields and a full hex dump of the raw 
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify -v scan tests/samples/eicar_test.com --threat-id 2147519003
+./maps_scanner --no-verify -v scan tests/samples/eicar_test.com --threat-id 2147519003
 ```
 
 #### Output (additional verbose sections)
@@ -1337,7 +1337,7 @@ Regional MAPS endpoints demonstrate geo-affinity routing. Latency varies by geog
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify --geo eu scan tests/samples/eicar_test.com --threat-id 2147519003
+./maps_scanner --no-verify --geo eu scan tests/samples/eicar_test.com --threat-id 2147519003
 ```
 
 #### Output
@@ -1367,7 +1367,7 @@ Latency:        454.4 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify --geo uk heartbeat
+./maps_scanner --no-verify --geo uk heartbeat
 ```
 
 #### Output
@@ -1385,7 +1385,7 @@ Latency:        383.0 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify --geo au url "https://example.com"
+./maps_scanner --no-verify --geo au url "https://example.com"
 ```
 
 #### Output
@@ -1406,7 +1406,7 @@ Latency:        974.1 ms
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify --geo us heartbeat
+./maps_scanner --no-verify --geo us heartbeat
 ```
 
 #### Output
@@ -1428,7 +1428,7 @@ The PPE (pre-production) endpoint is Microsoft-internal and doesn't resolve exte
 
 #### Command
 ```bash
-python -m tools.maps_scanner --ppe heartbeat
+./maps_scanner --ppe heartbeat
 ```
 
 #### Output
@@ -1451,7 +1451,7 @@ With GUID rotation, EICAR is detected even **without** explicitly providing `--t
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan tests/samples/eicar_test.com
+./maps_scanner --no-verify scan tests/samples/eicar_test.com
 ```
 
 #### Output
@@ -1482,7 +1482,7 @@ Submit SHA256 + SHA1 + MD5 together in a single hash query.
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan-hash \
+./maps_scanner --no-verify scan-hash \
   275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f \
   --sha1 3395856ce81f2b7382dee72602f798b642f14140 \
   --md5 44d88612fea8a8f36de82e1278abb02f \
@@ -1507,7 +1507,7 @@ Read script content from stdin (pipe) using `-` as the file argument.
 
 #### Command
 ```bash
-echo 'Write-Host "Hello from stdin"' | python -m tools.maps_scanner --no-verify amsi -
+echo 'Write-Host "Hello from stdin"' | ./maps_scanner --no-verify amsi -
 ```
 
 #### Output
@@ -1535,7 +1535,7 @@ Read file paths from stdin (pipe) using `-` as the list argument.
 #### Command
 ```bash
 printf "tests/samples/eicar_test.com\ntests/samples/minimal_test.exe\n" | \
-  python -m tools.maps_scanner --no-verify batch -
+  ./maps_scanner --no-verify batch -
 ```
 
 #### Output
@@ -1556,7 +1556,7 @@ Combine `-q` (quiet) and `-j` (JSON) for machine-parseable output with no stderr
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify -q -j scan tests/samples/eicar_test.com --threat-id 2147519003
+./maps_scanner --no-verify -q -j scan tests/samples/eicar_test.com --threat-id 2147519003
 ```
 
 #### Output
@@ -1594,7 +1594,7 @@ Modify config values on the fly with `--set-block-level` and `--set-spynet-level
 
 #### Command
 ```bash
-python -m tools.maps_scanner config --set-block-level 6 --set-spynet-level 2
+./maps_scanner config --set-block-level 6 --set-spynet-level 2
 ```
 
 #### Output
@@ -1626,7 +1626,7 @@ Geo ID:           244
 
 #### Command
 ```bash
-python -m tools.maps_scanner --no-verify scan /nonexistent/file.exe
+./maps_scanner --no-verify scan /nonexistent/file.exe
 ```
 
 #### Output
@@ -1641,7 +1641,7 @@ Exit code: **1**
 
 #### Command
 ```bash
-python -m tools.maps_scanner --endpoint "https://invalid.endpoint.test" scan tests/samples/eicar_test.com
+./maps_scanner --endpoint "https://invalid.endpoint.test" scan tests/samples/eicar_test.com
 ```
 
 #### Output
@@ -1660,7 +1660,7 @@ Without `--no-verify`, the MAPS endpoint's certificate fails verification on Lin
 
 #### Command
 ```bash
-python -m tools.maps_scanner scan tests/samples/eicar_test.com
+./maps_scanner scan tests/samples/eicar_test.com
 ```
 
 #### Output

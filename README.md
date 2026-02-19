@@ -32,31 +32,31 @@ The only required dependency is `requests`. Optional dependencies for enhanced a
 
 ```bash
 # Scan a local file
-python -m maps_scanner scan <file>
+./maps_scanner scan <file>
 
 # Query reputation by hash
-python -m maps_scanner scan-hash <sha256>
+./maps_scanner scan-hash <sha256>
 
 # URL reputation check
-python -m maps_scanner url <url>
+./maps_scanner url <url>
 
 # Connectivity test
-python -m maps_scanner heartbeat
+./maps_scanner heartbeat
 
 # Local-only PE analysis
-python -m maps_scanner analyze <file>
+./maps_scanner analyze <file>
 
 # Build a Bond payload without sending
-python -m maps_scanner build <file>
+./maps_scanner build <file>
 
 # Decode a captured Bond binary
-python -m maps_scanner decode <file>
+./maps_scanner decode <file>
 
 # Replay a previously captured payload
-python -m maps_scanner replay <file>
+./maps_scanner replay <file>
 
 # Show or edit configuration
-python -m maps_scanner config
+./maps_scanner config
 ```
 
 Add `--json` to any command for machine-readable output. Use `-v` for verbose protocol details.

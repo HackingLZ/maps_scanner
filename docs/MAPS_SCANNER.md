@@ -13,58 +13,58 @@ and live wire capture (ETW) of real Defender traffic.
 
 ```bash
 # Scan a file
-python -m tools.maps_scanner --no-verify scan /path/to/suspicious.exe
+./maps_scanner --no-verify scan /path/to/suspicious.exe
 
 # Scan by hash (no local file needed)
-python -m tools.maps_scanner --no-verify scan-hash \
+./maps_scanner --no-verify scan-hash \
     275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
 
 # Trigger FASTPATH signature delivery (requires threat_id + fresh GUID)
-python -m tools.maps_scanner --no-verify \
+./maps_scanner --no-verify \
     --machine-guid "$(python3 -c 'import uuid; print(uuid.uuid4())')" \
     scan /tmp/eicar_test.com --threat-id 2147519003
 
 # URL reputation check
-python -m tools.maps_scanner --no-verify url https://example.com
+./maps_scanner --no-verify url https://example.com
 
 # Heartbeat (connectivity test)
-python -m tools.maps_scanner --no-verify heartbeat
+./maps_scanner --no-verify heartbeat
 
 # Enhanced heartbeat (specific type)
-python -m tools.maps_scanner --no-verify heartbeat --type 1   # Setup heartbeat
-python -m tools.maps_scanner --no-verify heartbeat --type 8   # Signature update
+./maps_scanner --no-verify heartbeat --type 1   # Setup heartbeat
+./maps_scanner --no-verify heartbeat --type 8   # Signature update
 
 # Block at First Sight (BAFS) scan
-python -m tools.maps_scanner --no-verify bafs suspicious.exe
+./maps_scanner --no-verify bafs suspicious.exe
 
 # Upload sample for cloud detonation
-python -m tools.maps_scanner --no-verify upload suspicious.exe
+./maps_scanner --no-verify upload suspicious.exe
 
 # Scan with auto-upload if cloud requests the file
-python -m tools.maps_scanner --no-verify scan suspicious.exe --auto-upload
+./maps_scanner --no-verify scan suspicious.exe --auto-upload
 
 # Windows Defender Offline (WDO) scan report
-python -m tools.maps_scanner --no-verify wdo suspicious.exe
+./maps_scanner --no-verify wdo suspicious.exe
 
 # AMSI script submission (PowerShell, cscript, etc.)
-python -m tools.maps_scanner --no-verify amsi script.ps1
-python -m tools.maps_scanner --no-verify amsi script.vbs --app-id cscript.exe
-echo 'Write-Host "test"' | python -m tools.maps_scanner --no-verify amsi -
+./maps_scanner --no-verify amsi script.ps1
+./maps_scanner --no-verify amsi script.vbs --app-id cscript.exe
+echo 'Write-Host "test"' | ./maps_scanner --no-verify amsi -
 
 # Enterprise mode with Bearer token
-python -m tools.maps_scanner --no-verify --bearer-token "eyJ..." scan suspicious.exe
+./maps_scanner --no-verify --bearer-token "eyJ..." scan suspicious.exe
 
 # Verbose output with full hex dump
-python -m tools.maps_scanner --no-verify --verbose scan file.exe
+./maps_scanner --no-verify --verbose scan file.exe
 
 # JSON output
-python -m tools.maps_scanner --no-verify --json scan file.exe
+./maps_scanner --no-verify --json scan file.exe
 ```
 
 ## CLI Reference
 
 ```
-python -m tools.maps_scanner [global-options] <command> [command-options]
+./maps_scanner [global-options] <command> [command-options]
 ```
 
 ### Global Options
@@ -108,25 +108,25 @@ python -m tools.maps_scanner [global-options] <command> [command-options]
 
 ```bash
 # Scan with verbose output
-python -m tools.maps_scanner --no-verify -v scan malware.exe
+./maps_scanner --no-verify -v scan malware.exe
 
 # Scan EICAR with threat_id to get FASTPATH signature delivery
-python -m tools.maps_scanner --no-verify \
+./maps_scanner --no-verify \
     --machine-guid "$(python3 -c 'import uuid; print(uuid.uuid4())')" \
     scan /tmp/eicar_test.com --threat-id 2147519003
 
 # Build payload to file for later replay
-python -m tools.maps_scanner build suspicious.exe -o /tmp/payload.bin
-python -m tools.maps_scanner replay /tmp/payload.bin --confirm
+./maps_scanner build suspicious.exe -o /tmp/payload.bin
+./maps_scanner replay /tmp/payload.bin --confirm
 
 # Use with Fiddler/mitmproxy
-python -m tools.maps_scanner --proxy http://127.0.0.1:8080 --no-verify scan file.exe
+./maps_scanner --proxy http://127.0.0.1:8080 --no-verify scan file.exe
 
 # Use pre-production environment
-python -m tools.maps_scanner --ppe --no-verify heartbeat
+./maps_scanner --ppe --no-verify heartbeat
 
 # Geo-affinity endpoint (EU)
-python -m tools.maps_scanner --geo eu --no-verify scan file.exe
+./maps_scanner --geo eu --no-verify scan file.exe
 ```
 
 ---
@@ -639,13 +639,13 @@ Fully implemented. The `upload` CLI command supports:
 
 ```bash
 # Upload a file (request SAS URI from MAPS, then upload)
-python -m tools.maps_scanner --no-verify upload suspicious.exe
+./maps_scanner --no-verify upload suspicious.exe
 
 # Upload directly to a known SAS URI
-python -m tools.maps_scanner --no-verify upload file.exe --sas-uri "https://..."
+./maps_scanner --no-verify upload file.exe --sas-uri "https://..."
 
 # Scan + auto-upload if MAPS requests it
-python -m tools.maps_scanner --no-verify scan file.exe --auto-upload
+./maps_scanner --no-verify scan file.exe --auto-upload
 ```
 
 ---
